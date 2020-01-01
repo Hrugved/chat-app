@@ -7,14 +7,14 @@
     <title>Chat App</title>
 </head>
 <body>
-    <h1>Join Room</h1>
-    <form action="/chat.html">
-      <label>Display Name</label>
-      <input type="text" name="username" placeholder="Display Name" required>
-      <label>Room</label>
-      <input type="text" name="room" placeholder="Room" required>
-      <button>Join</button>
+    <h1>Chat App</h1>
+    <ul></ul>
+    <form id="message-form">
+        <input name="message" type="text" id="input">
+        <button id="button">Send</button>
     </form>
+    <div id="remark"></div>
+    <button id="send-location">Send Location</button>
 
 
     <script src="/socket.io/socket.io.js"></script>

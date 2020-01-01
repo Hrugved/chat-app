@@ -1,0 +1,53 @@
+// .emit => send event
+// .on => listen to event
+
+
+////////////////////////////////////////////////////////////////////////
+
+SERVER SIDE
+
+  Intialization: 
+    const express = require('express')
+    const path = require('path')
+    const http = require('http')
+    const socketio = require('socket.io')
+
+    const app = express()
+    const server = http.createServer(app)
+    const io = socketio(server)
+
+  main events: 
+    user connects => io.on('connection', (socket) => { 
+      .... 
+      ....
+      ....
+
+    user disconnects => socket.on('disconnect', () => { .... }) 
+
+    })
+
+  events:
+
+    io.emit() => emits to all sockets(i.e users)
+    socker.emit() => emits to this socket only
+    socker.broadcast.emit() => emits to all sockets except this
+
+
+
+
+
+////////////////////////////////////////////////////////////////////
+
+
+  CLIENT SIDE
+
+    Intialization:
+      include <script src="/socket.io/socket.io.js"></script>
+      const socket = io()
+      
+    Evnets:
+      socket.on()
+      socket.emit() 
+  
+
+  

@@ -1,7 +1,12 @@
 const express = require('express')
 const path = require('path')
+
+const Filter = require('bad-words')
+
 const http = require('http')
 const socketio = require('socket.io')
+
+const {generateMessage, generateLocation} = require('./utils/messages')
 
 const app = express()
 const server = http.createServer(app)
@@ -12,19 +17,37 @@ app.use(express.json())
 app.use(express.urlencoded({extended: true}))
 app.use(express.static(publicDirectoryPath))
 
-let count = 0;
-
-// runs for every client
+// socket connects
 io.on('connection', (socket) => {
-    console.log('New Websocket connection')
-    // emiting on 'socket' sends it to this single connected client 
-    socket.emit('countUpdated', count) // want to send initial count only to newly connected client
-    socket.on('increment', () => {
-        count++
-        // emiting on 'io' sends it to the all connected client
-        io.emit('countUpdated',count) // want to send updated count to all connected clients
+    
+    // emitters
+    socket.on('join', ({username,room}) => {
+        socket.join(room)
+        socket.emit('message', generateMessage('welcome!'))
+        socket.broadcast.to(room).emit('client_msg', generateMessage(`${username} has joined the chat`))
+    })
+
+    // listeners
+    socket.on('send_msg', (msg, cb) => {
+        const filter = new Filter()
+        if(filter.isProfane(msg)) {
+            return cb('profanity is not allowed')
+        }
+        cb()
+        io.emit('client_msg', generateMessage(msg))
+    })
+    socket.on('send_location', (pos, cb) => {
+        cb()
+        io.emit('client_location', generateLocation(pos))
+    })
+
+
+    // socket disconnects
+    socket.on('disconnect', () => {
+        io.emit('message', 'A user has left the chat')
     })
 })
+
 
 server.listen(process.env.PORT, () => {
     console.log(`Server is up and running on port ${process.env.PORT}`)
